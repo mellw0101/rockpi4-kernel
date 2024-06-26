@@ -1,0 +1,45 @@
+// To build a dot image file for flashing from the Radxa Rockchip BSP repository, follow these steps:
+// Clone the Repository:
+git clone -b master https://github.com/radxa/rockchip-bsp.git
+cd rockchip-bsp
+git submodule init
+git submodule update
+Set Up Docker Environment (recommended method):
+
+// Install Docker:
+sudo apt-get update
+sudo apt-get install binfmt-support qemu-user-static apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get update
+sudo apt-get install docker-ce
+
+// Build Docker Image:
+cd docker
+sudo docker build -t rockchip-radxa:1 -f ./Dockerfile .
+
+// Run Docker Container:
+docker run --privileged -it -v /path/to/rockchip-bsp:/root rockchip-radxa:1 /bin/bash
+
+// Build U-Boot:
+cd /root
+./build/mk-uboot.sh rockpi4b
+
+// Build Kernel:
+./build/mk-kernel.sh rockpi4b
+
+// Build Root Filesystem:
+cd rootfs
+dpkg -i ubuntu-build-service/packages/*
+apt-get install -f
+export ARCH=arm64  # or armhf for 32-bit
+RELEASE=buster TARGET=desktop ARCH=${ARCH} ./mk-base-debian.sh
+VERSION=debug ARCH=${ARCH} ./mk-rootfs-buster.sh && ./mk-image.sh
+
+// Combine into One Image:
+build/mk-image.sh -c rk3399 -b rockpi4 -t system -r rootfs/linaro-rootfs.img
+
+// Locate the Output Image:
+ls out/system.img
+
+// The final system.img is your dot image file ready for flashing. For more details, visit the Radxa Rockchip BSP repository.
