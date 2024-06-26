@@ -43,3 +43,16 @@ build/mk-image.sh -c rk3399 -b rockpi4 -t system -r rootfs/linaro-rootfs.img
 ls out/system.img
 
 // The final system.img is your dot image file ready for flashing. For more details, visit the Radxa Rockchip BSP repository.
+
+
+docker run --privileged -it -v /path/to/rockchip-bsp:/root/rockchip-bsp rockchip-radxa:1 /bin/bash
+
+# Inside the Docker container
+cd /root/rockchip-bsp
+
+// cat this to see opts
+source build/board_configs.sh rk3399
+
+# Now run the mk-uboot.sh script
+./build/mk-uboot.sh rk3399
+./build/mk-kernel.sh rk3399
