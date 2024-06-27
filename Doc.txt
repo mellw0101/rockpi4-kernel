@@ -26,7 +26,8 @@ cd /root
 ./build/mk-uboot.sh rockpi4b
 
 // Build Kernel:
-./build/mk-kernel.sh rockpi4b
+./build/mk-kernel.sh rockpi4b 
+// rk3399-rock-4c-plus
 
 // Build Root Filesystem:
 cd rootfs
